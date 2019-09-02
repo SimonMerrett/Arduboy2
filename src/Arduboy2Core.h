@@ -8,9 +8,11 @@
 #define ARDUBOY2_CORE_H
 
 #include <Arduino.h>
+
+#if !defined (_SAMD21_)
 #include <avr/power.h>
 #include <avr/sleep.h>
-
+#endif
 
 // main hardware compile flags
 
@@ -35,7 +37,26 @@
 #define RGB_OFF HIGH /**< For digitially setting an RGB LED off using digitalWriteRGB() */
 
 // ----- Arduboy pins -----
-#ifdef ARDUBOY_10
+#ifdef _SAMD21_
+/* from:
+https://microchipdeveloper.com/32arm:sam-bare-metal-c-programming
+and:
+arduino_zero\variant.cpp
+*/
+
+#define PIN_CS 11		// PA18 Display CS Arduino pin number
+#define CS_PORT PORTA	// Display CS port
+#define CS_BIT 18		// Display CS physical bit number
+
+#define PIN_DC 6        // PA20 Display D/C Arduino pin number
+#define DC_PORT PORTA   // Display D/C port
+#define DC_BIT 20	   	// Display D/C physical bit number
+
+#define PIN_RST 7       // PA21 Display reset Arduino pin number
+#define RST_PORT PORTA  // Display reset port
+#define RST_BIT 21  	// Display reset physical bit number
+
+#elif defined(ARDUBOY_10)
 
 #define PIN_CS 12       // Display CS Arduino pin number
 #define CS_PORT PORTD   // Display CS port

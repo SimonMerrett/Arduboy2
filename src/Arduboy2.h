@@ -8,7 +8,7 @@
 #define ARDUBOY2_H
 
 #include <Arduino.h>
-#include <EEPROM.h>
+//#include <EEPROM.h> // TODO: decide what to do about EEPROM
 #include "Arduboy2Core.h"
 #include "Arduboy2Beep.h"
 #include "Sprites.h"

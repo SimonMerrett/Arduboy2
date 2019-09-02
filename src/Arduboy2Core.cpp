@@ -6,7 +6,11 @@
 
 #include "Arduboy2Core.h"
 
-#include <avr/wdt.h>
+#ifdef _SAMD21_
+// TODO: Implement this
+#else
+#include <avr/wdt.h> 
+#endif
 
 const uint8_t PROGMEM lcdBootProgram[] = {
   // boot defaults are commented out but left here in case they
@@ -192,6 +196,27 @@ void Arduboy2Core::bootPins()
   // Port F outputs (none)
   // Speaker: Not set here. Controlled by audio class
 
+#elif defined(_SAMD21_)
+
+	// TODO: Implement this
+  pinMode(PIN_CS, OUTPUT);
+  pinMode(PIN_DC, OUTPUT);
+  pinMode(PIN_RST, OUTPUT);
+  
+  digitalWrite(PIN_CS, HIGH);
+  digitalWrite(PIN_RST, LOW);
+  // SPI hardware kludge until SAMD port manipulation is sorted
+  pinMode(11, OUTPUT); // MOSI
+  pinMode(13, OUTPUT); // SCK
+  // do we need SPI_SS here to get LCD working if we have PIN_CS above?
+  
+  pinMode(PIN_LEFT_BUTTON, INPUT_PULLUP);
+  pinMode(PIN_RIGHT_BUTTON, INPUT_PULLUP);
+  pinMode(PIN_UP_BUTTON, INPUT_PULLUP);
+  pinMode(PIN_DOWN_BUTTON, INPUT_PULLUP);
+  
+  pinMode(PIN_A_BUTTON, INPUT_PULLUP);
+  pinMode(PIN_B_BUTTON, INPUT_PULLUP);
 #endif
 }
 
@@ -267,18 +292,14 @@ void Arduboy2Core::safeMode()
 
 void Arduboy2Core::idle()
 {
-  SMCR = _BV(SE); // select idle mode and enable sleeping
-  sleep_cpu();
-  SMCR = 0; // disable sleeping
+// TODO: Implement this
+
 }
 
 void Arduboy2Core::bootPowerSaving()
 {
-  // disable Two Wire Interface (I2C) and the ADC
-  // All other bits will be written with 0 so will be enabled
-  PRR0 = _BV(PRTWI) | _BV(PRADC);
-  // disable USART1
-  PRR1 |= _BV(PRUSART1);
+// TODO: Implement this
+
 }
 
 // Shut down the display
@@ -322,29 +343,10 @@ void Arduboy2Core::paintScreen(const uint8_t *image)
 // It is specifically tuned for a 16MHz CPU clock and SPI clocking at 8MHz.
 void Arduboy2Core::paintScreen(uint8_t image[], bool clear)
 {
-  uint16_t count;
+ // TODO: Implement this
 
-  asm volatile (
-    "   ldi   %A[count], %[len_lsb]               \n\t" //for (len = WIDTH * HEIGHT / 8)
-    "   ldi   %B[count], %[len_msb]               \n\t"
-    "1: ld    __tmp_reg__, %a[ptr]      ;2        \n\t" //tmp = *(image)
-    "   out   %[spdr], __tmp_reg__      ;1        \n\t" //SPDR = tmp
-    "   cpse  %[clear], __zero_reg__    ;1/2      \n\t" //if (clear) tmp = 0;
-    "   mov   __tmp_reg__, __zero_reg__ ;1        \n\t"
-    "2: sbiw  %A[count], 1              ;2        \n\t" //len --
-    "   sbrc  %A[count], 0              ;1/2      \n\t" //loop twice for cheap delay
-    "   rjmp  2b                        ;2        \n\t"
-    "   st    %a[ptr]+, __tmp_reg__     ;2        \n\t" //*(image++) = tmp
-    "   brne  1b                        ;1/2 :18  \n\t" //len > 0
-    "   in    __tmp_reg__, %[spsr]                \n\t" //read SPSR to clear SPIF
-    : [ptr]     "+&e" (image),
-      [count]   "=&w" (count)
-    : [spdr]    "I"   (_SFR_IO_ADDR(SPDR)),
-      [spsr]    "I"   (_SFR_IO_ADDR(SPSR)),
-      [len_msb] "M"   (WIDTH * (HEIGHT / 8 * 2) >> 8),   // 8: pixels per byte
-      [len_lsb] "M"   (WIDTH * (HEIGHT / 8 * 2) & 0xFF), // 2: for delay loop multiplier
-      [clear]   "r"   (clear)
-  );
+
+
 }
 #if 0
 // For reference, this is the "closed loop" C++ version of paintScreen()
@@ -430,124 +432,47 @@ void Arduboy2Core::flipHorizontal(bool flipped)
 
 void Arduboy2Core::setRGBled(uint8_t red, uint8_t green, uint8_t blue)
 {
-#ifdef ARDUBOY_10 // RGB, all the pretty colors
-  // timer 0: Fast PWM, OC0A clear on compare / set at top
-  // We must stay in Fast PWM mode because timer 0 is used for system timing.
-  // We can't use "inverted" mode because it won't allow full shut off.
-  TCCR0A = _BV(COM0A1) | _BV(WGM01) | _BV(WGM00);
-  OCR0A = 255 - green;
-  // timer 1: Phase correct PWM 8 bit
-  // OC1A and OC1B set on up-counting / clear on down-counting (inverted). This
-  // allows the value to be directly loaded into the OCR with common anode LED.
-  TCCR1A = _BV(COM1A1) | _BV(COM1A0) | _BV(COM1B1) | _BV(COM1B0) | _BV(WGM10);
-  OCR1AL = blue;
-  OCR1BL = red;
-#elif defined(AB_DEVKIT)
-  // only blue on DevKit, which is not PWM capable
-  (void)red;    // parameter unused
-  (void)green;  // parameter unused
-  bitWrite(BLUE_LED_PORT, BLUE_LED_BIT, blue ? RGB_ON : RGB_OFF);
-#endif
+// TODO: Implement this
+
 }
 
 void Arduboy2Core::setRGBled(uint8_t color, uint8_t val)
 {
-#ifdef ARDUBOY_10
-  if (color == RED_LED)
-  {
-    OCR1BL = val;
-  }
-  else if (color == GREEN_LED)
-  {
-    OCR0A = 255 - val;
-  }
-  else if (color == BLUE_LED)
-  {
-    OCR1AL = val;
-  }
-#elif defined(AB_DEVKIT)
-  // only blue on DevKit, which is not PWM capable
-  if (color == BLUE_LED)
-  {
-    bitWrite(BLUE_LED_PORT, BLUE_LED_BIT, val ? RGB_ON : RGB_OFF);
-  }
-#endif
+// TODO: Implement this
+
 }
 
 void Arduboy2Core::freeRGBled()
 {
-#ifdef ARDUBOY_10
-  // clear the COM bits to return the pins to normal I/O mode
-  TCCR0A = _BV(WGM01) | _BV(WGM00);
-  TCCR1A = _BV(WGM10);
-#endif
+// TODO: Implement this
+
 }
 
 void Arduboy2Core::digitalWriteRGB(uint8_t red, uint8_t green, uint8_t blue)
 {
-#ifdef ARDUBOY_10
-  bitWrite(RED_LED_PORT, RED_LED_BIT, red);
-  bitWrite(GREEN_LED_PORT, GREEN_LED_BIT, green);
-  bitWrite(BLUE_LED_PORT, BLUE_LED_BIT, blue);
-#elif defined(AB_DEVKIT)
-  // only blue on DevKit
-  (void)red;    // parameter unused
-  (void)green;  // parameter unused
-  bitWrite(BLUE_LED_PORT, BLUE_LED_BIT, blue);
-#endif
+// TODO: Implement this
+
 }
 
 void Arduboy2Core::digitalWriteRGB(uint8_t color, uint8_t val)
 {
-#ifdef ARDUBOY_10
-  if (color == RED_LED)
-  {
-    bitWrite(RED_LED_PORT, RED_LED_BIT, val);
-  }
-  else if (color == GREEN_LED)
-  {
-    bitWrite(GREEN_LED_PORT, GREEN_LED_BIT, val);
-  }
-  else if (color == BLUE_LED)
-  {
-    bitWrite(BLUE_LED_PORT, BLUE_LED_BIT, val);
-  }
-#elif defined(AB_DEVKIT)
-  // only blue on DevKit
-  if (color == BLUE_LED)
-  {
-    bitWrite(BLUE_LED_PORT, BLUE_LED_BIT, val);
-  }
-#endif
+// TODO: Implement this
+
 }
 
 /* Buttons */
 
-uint8_t Arduboy2Core::buttonsState()
+uint8_t Arduboy2Core::buttonsState() // TODO: reintroduce original arduboy HW
 {
   uint8_t buttons;
 
-#ifdef ARDUBOY_10
-  // up, right, left, down
-  buttons = ((~PINF) &
-              (_BV(UP_BUTTON_BIT) | _BV(RIGHT_BUTTON_BIT) |
-               _BV(LEFT_BUTTON_BIT) | _BV(DOWN_BUTTON_BIT)));
-  // A
-  if (bitRead(A_BUTTON_PORTIN, A_BUTTON_BIT) == 0) { buttons |= A_BUTTON; }
-  // B
-  if (bitRead(B_BUTTON_PORTIN, B_BUTTON_BIT) == 0) { buttons |= B_BUTTON; }
-#elif defined(AB_DEVKIT)
-  // down, left, up
-  buttons = ((~PINB) &
-              (_BV(DOWN_BUTTON_BIT) | _BV(LEFT_BUTTON_BIT) | _BV(UP_BUTTON_BIT)));
-  // right
-  if (bitRead(RIGHT_BUTTON_PORTIN, RIGHT_BUTTON_BIT) == 0) { buttons |= RIGHT_BUTTON; }
-  // A
-  if (bitRead(A_BUTTON_PORTIN, A_BUTTON_BIT) == 0) { buttons |= A_BUTTON; }
-  // B
-  if (bitRead(B_BUTTON_PORTIN, B_BUTTON_BIT) == 0) { buttons |= B_BUTTON; }
-#endif
-
+  buttons = ((digitalRead(PIN_LEFT_BUTTON) << 5) | 
+			(digitalRead(PIN_RIGHT_BUTTON) << 6) | 
+			(digitalRead(PIN_UP_BUTTON) << 7) | 
+			(digitalRead(PIN_DOWN_BUTTON) << 4));
+  if(digitalRead(PIN_A_BUTTON == 0) { buttons |= (1 << 3); }			
+  if(digitalRead(PIN_B_BUTTON == 0) { buttons |= (1 << 2); }
+  
   return buttons;
 }
 
@@ -559,17 +484,7 @@ void Arduboy2Core::delayShort(uint16_t ms)
 
 void Arduboy2Core::exitToBootloader()
 {
-  cli();
-  // set bootloader magic key
-  // storing two uint8_t instead of one uint16_t saves an instruction
-  //  when high and low bytes of the magic key are the same
-  *(uint8_t *)MAGIC_KEY_POS = lowByte(MAGIC_KEY);
-  *(uint8_t *)(MAGIC_KEY_POS + 1) = highByte(MAGIC_KEY);
-  // enable watchdog timer reset, with 16ms timeout
-  wdt_reset();
-  WDTCSR = (_BV(WDCE) | _BV(WDE));
-  WDTCSR = _BV(WDE);
-  while (true) { }
+// TODO: Implement this
 }
 
 // Replacement main() that eliminates the USB stack code.
@@ -578,55 +493,6 @@ void Arduboy2Core::exitToBootloader()
 
 void Arduboy2Core::mainNoUSB()
 {
-  // disable USB
-  UDCON = _BV(DETACH);
-  UDIEN = 0;
-  UDINT = 0;
-  USBCON = _BV(FRZCLK);
-  UHWCON = 0;
-  power_usb_disable();
-
-  init();
-
-  // This would normally be done in the USB code that uses the TX and RX LEDs
-  TX_RX_LED_INIT;
-  TXLED0;
-  RXLED0;
-
-  // Set the DOWN button pin for INPUT_PULLUP
-  bitSet(DOWN_BUTTON_PORT, DOWN_BUTTON_BIT);
-  bitClear(DOWN_BUTTON_DDR, DOWN_BUTTON_BIT);
-
-  // Delay to give time for the pin to be pulled high if it was floating
-  delayShort(10);
-
-  // if the DOWN button is pressed
-  if (bitRead(DOWN_BUTTON_PORTIN, DOWN_BUTTON_BIT) == 0) {
-    exitToBootloader();
-  }
-
-  // The remainder is a copy of the Arduino main() function with the
-  // USB code and other unneeded code commented out.
-  // init() was called above.
-  // The call to function initVariant() is commented out to fix compiler
-  // error: "multiple definition of 'main'".
-  // The return statement is removed since this function is type void.
-
-//  init();
-
-//  initVariant();
-
-//#if defined(USBCON)
-//  USBDevice.attach();
-//#endif
-
-  setup();
-
-  for (;;) {
-    loop();
-//    if (serialEventRun) serialEventRun();
-  }
-
-//  return 0;
+  // Intentionally omitted for SAMD21
 }
 
