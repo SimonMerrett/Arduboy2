@@ -87,8 +87,9 @@ void Arduboy2Core::boot()
   #endif
 
   // Select the ADC input here so a delay isn't required in initRandomSeed()
+#ifndef ARDUBOY_SAMD  
   ADMUX = RAND_SEED_IN_ADMUX;
-
+#endif // ARDUBOY_SAMD  
   bootPins();
   bootSPI();
   bootOLED();
@@ -217,6 +218,8 @@ void Arduboy2Core::bootPins()
   
   pinMode(PIN_A_BUTTON, INPUT_PULLUP);
   pinMode(PIN_B_BUTTON, INPUT_PULLUP);
+  
+  pinMode(RAND_SEED_IN, INPUT);
 #endif
 }
 
@@ -224,12 +227,17 @@ void Arduboy2Core::bootOLED()
 {
   // reset the display
   delayShort(5); // reset pin should be low here. let it stay low a while
+#ifdef ARDUBOY_SAMD
+  digitalWrite(PIN_RST, HIGH); // set high to come out of reset
+  delayShort(5); // wait a while
+    // select the display (permanently, since nothing else is using SPI)
+  digitalWrite(PIN_CS, LOW); // TODO: deconflict so that SD card and flash can use SPI bus
+#else 
   bitSet(RST_PORT, RST_BIT); // set high to come out of reset
   delayShort(5); // wait a while
-
   // select the display (permanently, since nothing else is using SPI)
   bitClear(CS_PORT, CS_BIT);
-
+#endif
   // run our customized boot-up command sequence against the
   // OLED to initialize it properly for Arduboy
   LCDCommandMode();
@@ -241,12 +249,20 @@ void Arduboy2Core::bootOLED()
 
 void Arduboy2Core::LCDDataMode()
 {
+#ifdef ARDUBOY_SAMD
+  digitalWrite(PIN_DC, HIGH);
+#else	
   bitSet(DC_PORT, DC_BIT);
+#endif
 }
 
 void Arduboy2Core::LCDCommandMode()
 {
+#ifdef ARDUBOY_SAMD
+  digitalWrite(PIN_DC, LOW);
+#else	
   bitClear(DC_PORT, DC_BIT);
+#endif
 }
 
 // Initialize the SPI interface for the display

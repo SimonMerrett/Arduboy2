@@ -54,8 +54,9 @@ void Arduboy2Base::begin()
   flashlight(); // light the RGB LED and screen if UP button is being held.
 
   // check for and handle buttons held during start up for system control
+#ifndef ARDUBOY_SAMD
   systemButtons();
-
+#endif
   audio.begin();
 
   bootLogo();
@@ -79,7 +80,7 @@ void Arduboy2Base::flashlight()
   sendLCDCommand(OLED_ALL_PIXELS_ON); // smaller than allPixelsOn()
   digitalWriteRGB(RGB_ON, RGB_ON, RGB_ON);
 
-#ifndef ARDUBOY_CORE // for Arduboy core timer 0 should remain enabled
+#ifndef ARDUBOY_CORE || !defined ARDUBOY_SAMD // for Arduboy core timer 0 should remain enabled
   // prevent the bootloader magic number from being overwritten by timer 0
   // when a timer variable overlaps the magic number location, for when
   // flashlight mode is used for upload problem recovery
@@ -91,6 +92,7 @@ void Arduboy2Base::flashlight()
   }
 }
 
+#ifndef ARDUBOY_SAMD
 void Arduboy2Base::systemButtons()
 {
   while (pressed(B_BUTTON)) {
@@ -116,6 +118,7 @@ void Arduboy2Base::sysCtrlSound(uint8_t buttons, uint8_t led, uint8_t eeVal)
     while (pressed(buttons)) { } // Wait for button release
   }
 }
+#endif
 
 void Arduboy2Base::bootLogo()
 {
@@ -297,6 +300,7 @@ unsigned long Arduboy2Base::generateRandomSeed()
 {
   unsigned long seed;
 
+#ifndef ARDUBOY_SAMD
   power_adc_enable(); // ADC on
 
   // do an ADC read from an unconnected input pin
@@ -306,7 +310,9 @@ unsigned long Arduboy2Base::generateRandomSeed()
   seed = ((unsigned long)ADC << 16) + micros();
 
   power_adc_disable(); // ADC off
-
+#else
+	seed = ((unsigned long)analogRead(RAND_SEED_IN) << 16) + micros();
+#endif // ndef ARDUBOY_SAMD
   return seed;
 }
 

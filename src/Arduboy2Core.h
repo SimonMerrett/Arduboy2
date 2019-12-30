@@ -9,7 +9,7 @@
 
 #include <Arduino.h>
 
-#if !defined (_SAMD21_)
+#if !defined (_SAMD21_) // TODO: replace with agreed condition for SAMD port
 #include <avr/power.h>
 #include <avr/sleep.h>
 #endif
@@ -29,20 +29,60 @@
  *     // #define ARDUBOY_10
  *     #define AB_DEVKIT
  */
+#if defined _SAMD21_ // TODO: replace with agreed condition for SAMD port
+#define ARDUBOY_SAMD // TODO: rename with agreed #define name for SAMD version of library port
+#else
 #define ARDUBOY_10   //< compile for the production Arduboy v1.0
 // #define AB_DEVKIT    //< compile for the official dev kit
-#endif
+#endif // defined _SAMD21_
+#endif // !defined(ARDUBOY_10) && !defined(AB_DEVKIT)
 
 #define RGB_ON LOW   /**< For digitially setting an RGB LED on using digitalWriteRGB() */
 #define RGB_OFF HIGH /**< For digitially setting an RGB LED off using digitalWriteRGB() */
 
 // ----- Arduboy pins -----
-#ifdef _SAMD21_
+#ifdef ARDUBOY_SAMD // TODO: rename with agreed #define name for SAMD version of library port
 /* from:
 https://microchipdeveloper.com/32arm:sam-bare-metal-c-programming
 and:
 arduino_zero\variant.cpp
 */
+//#define DISPLAY_CS 10  // TODO: remove if replaced by PIN_CS, BIT and PORT below?
+//#define DISPLAY_DC 6 // TODO: remove if replaced by PIN_DC, BIT and PORT below?
+//#define DISPLAY_RST 7 // TODO: remove if replaced by PIN_RST, BIT and PORT below?
+
+#define SD_CARD_CS 2
+
+#define RED_LED 3
+#define GREEN_LED 8
+#define BLUE_LED 9
+#define TX_LED PIN_LED_TXL
+#define RX_LED PIN_LED_RXL
+
+// pin values for buttons, probably shouldn't use these
+#define PIN_LEFT_BUTTON 0
+#define PIN_RIGHT_BUTTON 1
+#define PIN_UP_BUTTON 4
+#define PIN_DOWN_BUTTON A3
+#define PIN_A_BUTTON A1
+#define PIN_B_BUTTON A2
+
+// bit values for button states
+#define LEFT_BUTTON bit(7)
+#define RIGHT_BUTTON bit(6)
+#define UP_BUTTON bit(4)
+#define DOWN_BUTTON bit(0)
+#define A_BUTTON bit(1)
+#define B_BUTTON bit(2)
+
+#define PIN_SPEAKER_1 5
+#define PIN_SPEAKER_2 A0
+
+#define PIN_SPEAKER_1_PORT digitalPinToPort(PIN_SPEAKER_1)
+#define PIN_SPEAKER_2_PORT digitalPinToPort(PIN_SPEAKER_2)
+
+#define PIN_SPEAKER_1_BITMASK digitalPinToBitMask(PIN_SPEAKER_1)
+#define PIN_SPEAKER_2_BITMASK digitalPinToBitMask(PIN_SPEAKER_2)
 
 #define PIN_CS 11		// PA18 Display CS Arduino pin number
 #define CS_PORT PORTA	// Display CS port
@@ -224,17 +264,19 @@ arduino_zero\variant.cpp
 //
 // Reference: https://github.com/Arduboy/Arduboy/issues/108
 
-#endif
+#endif //
 // --------------------
 
 // ----- Pins common on Arduboy and DevKit -----
 
 // Unconnected analog input used for noise by initRandomSeed()
-#define RAND_SEED_IN A4
-#define RAND_SEED_IN_PORT PORTF
-#define RAND_SEED_IN_BIT PORTF1
-// Value for ADMUX to read the random seed pin: 2.56V reference, ADC1
-#define RAND_SEED_IN_ADMUX (_BV(REFS0) | _BV(REFS1) | _BV(MUX0))
+#define RAND_SEED_IN A4 // TODO check this works in setting pinModes
+#ifndef ARDUBOY_SAMD // TODO work out if these are required
+	#define RAND_SEED_IN_PORT PORTF
+	#define RAND_SEED_IN_BIT PORTF1
+	// Value for ADMUX to read the random seed pin: 2.56V reference, ADC1
+	#define RAND_SEED_IN_ADMUX (_BV(REFS0) | _BV(REFS1) | _BV(MUX0))
+#endif
 
 // SPI interface
 #define SPI_MISO_PORT PORTB
