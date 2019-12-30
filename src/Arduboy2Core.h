@@ -10,8 +10,10 @@
 #include <Arduino.h>
 
 #if !defined (_SAMD21_) // TODO: replace with agreed condition for SAMD port
-#include <avr/power.h>
-#include <avr/sleep.h>
+  #include <avr/power.h>
+  #include <avr/sleep.h>
+#else
+  #include <SPI.h>
 #endif
 
 // main hardware compile flags

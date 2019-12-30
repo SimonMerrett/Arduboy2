@@ -7,7 +7,7 @@
 #include <Arduino.h>
 #include "Arduboy2Beep.h"
 
-#ifndef AB_DEVKIT || defined ARDUBOY_SAMD
+#if !defined AB_DEVKIT && !defined ARDUBOY_SAMD
 
 // Speaker pin 1, Timer 3A, Port C bit 6, Arduino pin 5
 

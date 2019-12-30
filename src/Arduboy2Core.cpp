@@ -197,7 +197,7 @@ void Arduboy2Core::bootPins()
   // Port F outputs (none)
   // Speaker: Not set here. Controlled by audio class
 
-#elif defined(_SAMD21_)
+#elif defined(ARDUBOY_SAMD)
 
 	// TODO: Implement this
   pinMode(PIN_CS, OUTPUT);
@@ -268,14 +268,23 @@ void Arduboy2Core::LCDCommandMode()
 // Initialize the SPI interface for the display
 void Arduboy2Core::bootSPI()
 {
+#ifdef ARDUBOY_SAMD
+  SPI.beginTransaction(SPISettings(1000000, MSBFIRST, SPI_MODE0)); // was 8000000
+
+  LCDDataMode(); // should be the equivalent function from ArduboyCore2 to the one from ArduboyCore_Z
+#else
 // master, mode 0, MSB first, CPU clock / 2 (8MHz)
   SPCR = _BV(SPE) | _BV(MSTR);
   SPSR = _BV(SPI2X);
+#endif  
 }
 
 // Write to the SPI bus (MOSI pin)
 void Arduboy2Core::SPItransfer(uint8_t data)
 {
+#ifdef ARDUBOY_SAMD	
+  SPI.transfer(data);
+#else	
   SPDR = data;
   /*
    * The following NOP introduces a small delay that can prevent the wait
@@ -285,6 +294,7 @@ void Arduboy2Core::SPItransfer(uint8_t data)
    */
   asm volatile("nop");
   while (!(SPSR & _BV(SPIF))) { } // wait
+#endif  
 }
 
 void Arduboy2Core::safeMode()

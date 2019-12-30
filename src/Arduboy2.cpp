@@ -80,7 +80,7 @@ void Arduboy2Base::flashlight()
   sendLCDCommand(OLED_ALL_PIXELS_ON); // smaller than allPixelsOn()
   digitalWriteRGB(RGB_ON, RGB_ON, RGB_ON);
 
-#ifndef ARDUBOY_CORE || !defined ARDUBOY_SAMD // for Arduboy core timer 0 should remain enabled
+#if !defined ARDUBOY_CORE && !defined ARDUBOY_SAMD // for Arduboy core timer 0 should remain enabled
   // prevent the bootloader magic number from being overwritten by timer 0
   // when a timer variable overlaps the magic number location, for when
   // flashlight mode is used for upload problem recovery
@@ -281,13 +281,14 @@ bool Arduboy2Base::nextFrame()
 bool Arduboy2Base::nextFrameDEV()
 {
   bool ret = nextFrame();
-
+#ifndef ARDUBOY_SAMD
   if (ret) {
     if (lastFrameDurationMs > eachFrameMillis)
       TXLED1;
     else
       TXLED0;
   }
+#endif  
   return ret;
 }
 
@@ -311,7 +312,7 @@ unsigned long Arduboy2Base::generateRandomSeed()
 
   power_adc_disable(); // ADC off
 #else
-	seed = ((unsigned long)analogRead(RAND_SEED_IN) << 16) + micros();
+	seed = analogRead(A4) * ~micros() + micros();
 #endif // ndef ARDUBOY_SAMD
   return seed;
 }
@@ -328,6 +329,7 @@ void Arduboy2Base::clear()
   fillScreen(BLACK);
 }
 
+#ifndef ARDUBOY_SAMD
 void Arduboy2Base::drawPixel(int16_t x, int16_t y, uint8_t color)
 {
   #ifdef PIXEL_SAFE_MODE
@@ -335,7 +337,7 @@ void Arduboy2Base::drawPixel(int16_t x, int16_t y, uint8_t color)
   {
     return;
   }
-  #endif
+  #endif // PIXEL_SAFE_MODE
 
   uint16_t row_offset;
   uint8_t bit;
@@ -358,7 +360,7 @@ void Arduboy2Base::drawPixel(int16_t x, int16_t y, uint8_t color)
     "add  %A[row_offset], %[x]         \n" //row_offset += x
 #if WIDTH != 128
     "adc  %B[row_offset], __zero_reg__ \n" // only non 128 width can overflow
-#endif
+#endif //  WIDTH != 128
     : [row_offset]   "=&x" (row_offset),   // upper register (ANDI)
       [bit]          "=&d" (bit),          // upper register (LDI)
       [y]            "+d"  (y)             // upper register (ANDI), must be writable
@@ -370,7 +372,7 @@ void Arduboy2Base::drawPixel(int16_t x, int16_t y, uint8_t color)
   if (!(color & _BV(0))) data ^= bit;
   sBuffer[row_offset] = data;
 }
-#if 0
+#else // ndef ARDUBOY_SAMD
 // For reference, this is the C++ equivalent
 void Arduboy2Base::drawPixel(int16_t x, int16_t y, uint8_t color)
 {
@@ -379,7 +381,7 @@ void Arduboy2Base::drawPixel(int16_t x, int16_t y, uint8_t color)
   {
     return;
   }
-  #endif
+  #endif // PIXEL_SAFE_MODE
 
   uint16_t row_offset;
   uint8_t bit;
@@ -390,13 +392,18 @@ void Arduboy2Base::drawPixel(int16_t x, int16_t y, uint8_t color)
   if (!color) data ^= bit;
   sBuffer[row_offset] = data;
 }
-#endif
+#endif // ndef ARDUBOY_SAMD
 
 uint8_t Arduboy2Base::getPixel(uint8_t x, uint8_t y)
 {
   uint8_t row = y / 8;
   uint8_t bit_position = y % 8;
+#ifndef ARDUBOY_SAMD
   return (sBuffer[(row*WIDTH) + x] & _BV(bit_position)) >> bit_position;
+#else
+// TODO put something in here
+  return (sBuffer[(row*WIDTH) + x] & bit(bit_position)) >> bit_position;
+#endif	
 }
 
 void Arduboy2Base::drawCircle(int16_t x0, int16_t y0, uint8_t r, uint8_t color)
