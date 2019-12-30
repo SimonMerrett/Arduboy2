@@ -5,10 +5,47 @@
  */
 
 #include <Arduino.h>
+#include "Arduboy2.h" // included to try and define ARDUBOY_SAMD where needed
 #include "Arduboy2Beep.h"
 
-#if !defined AB_DEVKIT && !defined ARDUBOY_SAMD
+#ifdef ARDUBOY_SAMD
 
+uint8_t BeepPin1::duration = 0;
+void BeepPin1::begin() // TODO: implement if needed
+{
+}
+void BeepPin1::tone(uint16_t count) // TODO: implement if needed
+{
+}
+void BeepPin1::tone(uint16_t count, uint8_t dur) // TODO: implement if needed
+{
+}
+void BeepPin1::timer() // TODO: implement if needed
+{
+}
+void BeepPin1::noTone() // TODO: implement if needed
+{
+}
+uint8_t BeepPin2::duration = 0;
+void BeepPin2::begin() // TODO: implement if needed
+{
+}
+void BeepPin2::tone(uint16_t count) // TODO: implement if needed
+{
+}
+void BeepPin2::tone(uint16_t count, uint8_t dur) // TODO: implement if needed
+{
+}
+void BeepPin2::timer() // TODO: implement if needed
+{
+}
+void BeepPin2::noTone() // TODO: implement if needed
+{
+}
+#endif
+
+#ifndef AB_DEVKIT 
+#ifndef ARDUBOY_SAMD
 // Speaker pin 1, Timer 3A, Port C bit 6, Arduino pin 5
 
 uint8_t BeepPin1::duration = 0;
@@ -84,40 +121,14 @@ void BeepPin2::noTone()
   TCCR4A = 0; // set normal mode (which disconnects the pin)
 }
 
-#elif defined ARDUBOY_SAMD
-uint8_t BeepPin1::duration = 0;
-void BeepPin1::begin() // TODO: implement if needed
-{
-}
-void BeepPin1::tone(uint16_t count) // TODO: implement if needed
-{
-}
-void BeepPin1::tone(uint16_t count, uint8_t dur) // TODO: implement if needed
-{
-}
-void BeepPin1::timer() // TODO: implement if needed
-{
-}
-void BeepPin1::noTone() // TODO: implement if needed
-{
-}
-uint8_t BeepPin2::duration = 0;
-void BeepPin2::begin() // TODO: implement if needed
-{
-}
-void BeepPin2::tone(uint16_t count) // TODO: implement if needed
-{
-}
-void BeepPin2::tone(uint16_t count, uint8_t dur) // TODO: implement if needed
-{
-}
-void BeepPin2::timer() // TODO: implement if needed
-{
-}
-void BeepPin2::noTone() // TODO: implement if needed
-{
-}
+#else
 
+
+
+
+
+
+#endif //ndef ARDUBOY_SAMD
 #else /* AB_DEVKIT */
 
 // *** The pins used for the speaker on the DevKit cannot be directly
@@ -185,4 +196,4 @@ void BeepPin2::noTone()
   duration = 0;
 }
 
-#endif
+#endif /* AB_DEVKIT */

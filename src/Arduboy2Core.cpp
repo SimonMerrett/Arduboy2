@@ -303,7 +303,7 @@ void Arduboy2Core::safeMode()
   {
     digitalWriteRGB(RED_LED, RGB_ON);
 
-#ifndef ARDUBOY_CORE // for Arduboy core timer 0 should remain enabled
+#if !defined ARDUBOY_CORE && !defined ARDUBOY_SAMD // for Arduboy core timer 0 should remain enabled
     // prevent the bootloader magic number from being overwritten by timer 0
     // when a timer variable overlaps the magic number location
     power_timer0_disable();
@@ -336,7 +336,11 @@ void Arduboy2Core::displayOff()
   SPItransfer(0x8D); // charge pump:
   SPItransfer(0x10); //   disable
   delayShort(250);
+#ifndef ARDUBOY_SAMD  
   bitClear(RST_PORT, RST_BIT); // set display reset pin low (reset state)
+#else
+  digitalWrite(PIN_RST, LOW); // set display reset pin low (reset state)
+#endif	
 }
 
 // Restart the display after a displayOff()
@@ -496,8 +500,8 @@ uint8_t Arduboy2Core::buttonsState() // TODO: reintroduce original arduboy HW
 			(digitalRead(PIN_RIGHT_BUTTON) << 6) | 
 			(digitalRead(PIN_UP_BUTTON) << 7) | 
 			(digitalRead(PIN_DOWN_BUTTON) << 4));
-  if(digitalRead(PIN_A_BUTTON == 0) { buttons |= (1 << 3); }			
-  if(digitalRead(PIN_B_BUTTON == 0) { buttons |= (1 << 2); }
+  if(digitalRead(PIN_A_BUTTON == 0)) { buttons |= (1 << 3); }			
+  if(digitalRead(PIN_B_BUTTON == 0)) { buttons |= (1 << 2); }
   
   return buttons;
 }

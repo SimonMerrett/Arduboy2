@@ -664,6 +664,7 @@ void Arduboy2Base::fillRect
 
 void Arduboy2Base::fillScreen(uint8_t color)
 {
+#ifndef ARDUBOY_SAMD  // for AVR architecture
   // C version:
   //
   // if (color != BLACK)
@@ -708,6 +709,14 @@ void Arduboy2Base::fillScreen(uint8_t color)
     :
     :
   );
+#else // for SAMD
+  // TODO add assembler version for SAMD
+  //change any nonzero argument to b11111111 and insert into screen array.
+  if (color)
+    color = B11111111;
+
+  memset(sBuffer, color, HEIGHT * WIDTH / 8);
+#endif // ndef ARDUBOY_SAMD	
 }
 
 void Arduboy2Base::drawRoundRect
@@ -1097,20 +1106,25 @@ bool Arduboy2Base::collide(Rect rect1, Rect rect2)
 
 uint16_t Arduboy2Base::readUnitID()
 {
+#ifndef ARDUBOY_SAMD
   return EEPROM.read(EEPROM_UNIT_ID) |
          (((uint16_t)(EEPROM.read(EEPROM_UNIT_ID + 1))) << 8);
+#endif // ndef ARDUBOY_SAMD		 
 }
 
 void Arduboy2Base::writeUnitID(uint16_t id)
 {
+#ifndef ARDUBOY_SAMD
   EEPROM.update(EEPROM_UNIT_ID, (uint8_t)(id & 0xff));
   EEPROM.update(EEPROM_UNIT_ID + 1, (uint8_t)(id >> 8));
+#endif // ndef ARDUBOY_SAMD
 }
 
 uint8_t Arduboy2Base::readUnitName(char* name)
-{
+{	
   char val;
   uint8_t dest;
+#ifndef ARDUBOY_SAMD  
   uint8_t src = EEPROM_UNIT_NAME;
 
   for (dest = 0; dest < ARDUBOY_UNIT_NAME_LEN; dest++)
@@ -1125,10 +1139,12 @@ uint8_t Arduboy2Base::readUnitName(char* name)
 
   name[dest] = 0x00;
   return dest;
+#endif // ndef ARDUBOY_SAMD  
 }
 
 void Arduboy2Base::writeUnitName(char* name)
 {
+#ifndef ARDUBOY_SAMD  	
   bool done = false;
   uint8_t dest = EEPROM_UNIT_NAME;
 
@@ -1141,45 +1157,58 @@ void Arduboy2Base::writeUnitName(char* name)
     EEPROM.update(dest, done ? 0x00 : name[src]);
     dest++;
   }
+#endif // ndef ARDUBOY_SAMD    
 }
 
 bool Arduboy2Base::readShowBootLogoFlag()
 {
+#ifndef ARDUBOY_SAMD  		
   return (EEPROM.read(EEPROM_SYS_FLAGS) & SYS_FLAG_SHOW_LOGO_MASK);
+#endif // ndef ARDUBOY_SAMD    
 }
 
 void Arduboy2Base::writeShowBootLogoFlag(bool val)
 {
+#ifndef ARDUBOY_SAMD  		
   uint8_t flags = EEPROM.read(EEPROM_SYS_FLAGS);
 
   bitWrite(flags, SYS_FLAG_SHOW_LOGO, val);
   EEPROM.update(EEPROM_SYS_FLAGS, flags);
+#endif // ndef ARDUBOY_SAMD    
 }
 
 bool Arduboy2Base::readShowUnitNameFlag()
 {
+#ifndef ARDUBOY_SAMD  		
   return (EEPROM.read(EEPROM_SYS_FLAGS) & SYS_FLAG_UNAME_MASK);
+#endif // ndef ARDUBOY_SAMD    
 }
 
 void Arduboy2Base::writeShowUnitNameFlag(bool val)
 {
+#ifndef ARDUBOY_SAMD  		
   uint8_t flags = EEPROM.read(EEPROM_SYS_FLAGS);
 
   bitWrite(flags, SYS_FLAG_UNAME, val);
   EEPROM.update(EEPROM_SYS_FLAGS, flags);
+#endif // ndef ARDUBOY_SAMD    
 }
 
 bool Arduboy2Base::readShowBootLogoLEDsFlag()
 {
+#ifndef ARDUBOY_SAMD  	
   return (EEPROM.read(EEPROM_SYS_FLAGS) & SYS_FLAG_SHOW_LOGO_LEDS_MASK);
+#endif // ndef ARDUBOY_SAMD    
 }
 
 void Arduboy2Base::writeShowBootLogoLEDsFlag(bool val)
 {
+#ifndef ARDUBOY_SAMD  		
   uint8_t flags = EEPROM.read(EEPROM_SYS_FLAGS);
 
   bitWrite(flags, SYS_FLAG_SHOW_LOGO_LEDS, val);
   EEPROM.update(EEPROM_SYS_FLAGS, flags);
+#endif // ndef ARDUBOY_SAMD    
 }
 
 void Arduboy2Base::swap(int16_t& a, int16_t& b)
@@ -1253,6 +1282,7 @@ void Arduboy2::bootLogoText()
 
 void Arduboy2::bootLogoExtra()
 {
+#ifndef ARDUBOY_SAMD  	
   uint8_t c;
 
   if (!readShowUnitNameFlag())
@@ -1278,6 +1308,7 @@ void Arduboy2::bootLogoExtra()
     display();
     delayShort(1000);
   }
+#endif // ndef ARDUBOY_SAMD  
 }
 
 size_t Arduboy2::write(uint8_t c)
