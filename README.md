@@ -1,6 +1,10 @@
-# Arduboy2 Library
+# Arduboy2 Library WIP port to SAMD
 
-The Arduboy2 library is maintained in a git repository hosted on [GitHub](https://github.com/) at:
+*This is WORK IN PROGRESS - please do not consider usable in its current state*
+
+**It aims to enable Arduboy games to be compiled from source to run on SAMD21-based microcontroller devices.**
+
+The original Arduboy2 library is maintained in a git repository hosted on [GitHub](https://github.com/) at:
 
 https://github.com/MLXXXp/Arduboy2
 
