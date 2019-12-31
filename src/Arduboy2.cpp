@@ -122,7 +122,32 @@ void Arduboy2Base::sysCtrlSound(uint8_t buttons, uint8_t led, uint8_t eeVal)
 
 void Arduboy2Base::bootLogo()
 {
+#ifndef ARDUBOY_SAMD	
   bootLogoShell(drawLogoBitmap);
+#else
+  digitalWrite(RED_LED, RGB_ON);
+
+  for (int8_t y = -18; y <= 24; y++)
+  {
+    if (y == -4)
+    {
+      digitalWriteRGB(RGB_OFF, RGB_ON, RGB_OFF); // green LED on
+    }
+    else if (y == 24)
+    {
+      digitalWriteRGB(RGB_OFF, RGB_OFF, RGB_ON); // blue LED on
+    }
+
+    clear();
+    drawBitmap(20, y, arduboy_logo, 88, 16, WHITE);
+    display();
+    delay(27);
+    // longer delay post boot, we put it inside the loop to
+    // save the flash calling clear/delay again outside the loop
+    if (y == -16)
+      delay(250);
+  }
+#endif  
 }
 
 void Arduboy2Base::drawLogoBitmap(int16_t y)

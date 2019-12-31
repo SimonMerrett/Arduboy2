@@ -90,7 +90,7 @@ void Arduboy2Core::boot()
 #ifndef ARDUBOY_SAMD  
   ADMUX = RAND_SEED_IN_ADMUX;
 #endif // ARDUBOY_SAMD  
-  bootPins();
+  bootPins(); // TODO: now working 
   // DEBUG - have commented out boot functions to isolate those not working
   bootSPI(); // TODO: test individually
   bootOLED(); // TODO: test individually
@@ -270,6 +270,7 @@ void Arduboy2Core::LCDCommandMode()
 void Arduboy2Core::bootSPI()
 {
 #ifdef ARDUBOY_SAMD
+  SPI.begin(); // TODO: experimental to address issue of no spi signal detected on M0 port
   SPI.beginTransaction(SPISettings(1000000, MSBFIRST, SPI_MODE0)); // was 8000000
 
   LCDDataMode(); // should be the equivalent function from ArduboyCore2 to the one from ArduboyCore_Z
