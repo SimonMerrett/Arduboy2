@@ -10,6 +10,15 @@
 #include "Arduboy2.h"
 #include "SpritesCommon.h"
 
+/* TODO: this section is experimental to address the issue of assembly being used in Sprites.cpp
+#if !defined(ARDUINO_ARCH_AVR)
+	#include "SpritesB.h"
+
+using Sprites = SpritesB;
+#else
+//end of experimental section - need to remove the additional #endif at the end of the file below if removing the experimental secion.
+*/
+
 /** \brief
  * A class for drawing animated sprites from image and mask bitmaps.
  *
@@ -257,4 +266,5 @@ class Sprites
                            uint8_t w, uint8_t h, uint8_t draw_mode);
 };
 
+//#endif // experimental section
 #endif

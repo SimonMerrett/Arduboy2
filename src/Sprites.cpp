@@ -241,8 +241,10 @@ void Sprites::drawBitmap(int16_t x, int16_t y,
 
 
     case SPRITE_PLUS_MASK:
+	{
+	// TODO: Implement drawPlusMask mode functionality
       // *2 because we use double the bits (mask + bitmap)
-      bofs = (uint8_t *)(bitmap + ((start_h * w) + xOffset) * 2);
+ /*      bofs = (uint8_t *)(bitmap + ((start_h * w) + xOffset) * 2);
 
       uint8_t xi = rendered_width; // counter for x loop below
 
@@ -354,7 +356,8 @@ void Sprites::drawBitmap(int16_t x, int16_t y,
         // We do that by specifying all the inputs and outputs use either
         // lower registers (l) or simple (r16-r23) upper registers (a).
         : // pushes/clobbers/pops r28 and r29 (y)
-      );
+      ); */
       break;
+	}
   }
 }

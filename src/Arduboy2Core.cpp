@@ -91,9 +91,10 @@ void Arduboy2Core::boot()
   ADMUX = RAND_SEED_IN_ADMUX;
 #endif // ARDUBOY_SAMD  
   bootPins();
-  bootSPI();
-  bootOLED();
-  bootPowerSaving();
+  // DEBUG - have commented out boot functions to isolate those not working
+  bootSPI(); // TODO: test individually
+  bootOLED(); // TODO: test individually
+ // bootPowerSaving(); // TODO: test individually
 }
 
 #ifdef ARDUBOY_SET_CPU_8MHZ
@@ -207,8 +208,8 @@ void Arduboy2Core::bootPins()
   digitalWrite(PIN_CS, HIGH);
   digitalWrite(PIN_RST, LOW);
   // SPI hardware kludge until SAMD port manipulation is sorted
-  pinMode(11, OUTPUT); // MOSI
-  pinMode(13, OUTPUT); // SCK
+ // pinMode(11, OUTPUT); // MOSI
+ // pinMode(13, OUTPUT); // SCK
   // do we need SPI_SS here to get LCD working if we have PIN_CS above?
   
   pinMode(PIN_LEFT_BUTTON, INPUT_PULLUP);
@@ -495,13 +496,20 @@ void Arduboy2Core::digitalWriteRGB(uint8_t color, uint8_t val)
 uint8_t Arduboy2Core::buttonsState() // TODO: reintroduce original arduboy HW
 {
   uint8_t buttons;
-
+/* TODO: probably delete this section as the code immediately below this commented block is from ARDUBOY_Z and works!
   buttons = ((digitalRead(PIN_LEFT_BUTTON) << 5) | 
 			(digitalRead(PIN_RIGHT_BUTTON) << 6) | 
 			(digitalRead(PIN_UP_BUTTON) << 7) | 
 			(digitalRead(PIN_DOWN_BUTTON) << 4));
   if(digitalRead(PIN_A_BUTTON == 0)) { buttons |= (1 << 3); }			
   if(digitalRead(PIN_B_BUTTON == 0)) { buttons |= (1 << 2); }
+ */ 
+    // buttons: L R x U x B A D
+  // PORT A bits: left 11, right 10, up 8, down 4
+  buttons = (~PORT->Group[PORTA].IN.reg & (bit(11) | bit(10) | bit(8) | bit(4)))
+            >> 4;
+  // PORT B bits: B 9, A 8
+  buttons |= (~PORT->Group[PORTB].IN.reg & (bit(9) | bit(8))) >> 7;
   
   return buttons;
 }
