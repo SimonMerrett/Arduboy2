@@ -376,9 +376,15 @@ void Arduboy2Core::paintScreen(const uint8_t *image)
 void Arduboy2Core::paintScreen(uint8_t image[], bool clear)
 {
  // TODO: Implement this
-
-
-
+#ifdef ARDUBOY_SAMD
+  // TODO optimise like AVR version
+  for (int i = 0; i < (HEIGHT*WIDTH)/8; i++)
+  {
+    SPItransfer(image[i]);
+  }
+#else
+//TODO: reinsert the AVR code here and swap round the #ifdef with ifndef etc to make AVR the special case
+#endif
 }
 #if 0
 // For reference, this is the "closed loop" C++ version of paintScreen()
