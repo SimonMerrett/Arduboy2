@@ -12,6 +12,34 @@
 #include <avr/wdt.h> 
 #endif
 
+#if defined (ARDUBOY_SAMD)
+// THIS CODE INITIALISES THE 128*64 LCD DISPLAY WTIH UC1701 CONTROLLER WITH SPI INTERFACE - NOT FOR NORMAL ARDUBOYS. TAKEN FROM U8G2LIB
+const uint8_t PROGMEM lcdBootProgram[] = {  // all data verified with o'scope using u8g2 example of ug2.begin()
+0xE2, /* soft reset 0x0e2*/
+0xAE, /* display off 0x0ae*/
+0x40, /* set display start line to 0   0x040*/
+0xA0, /* ADC set to reverse 0x0a0*/
+0xC8, /* common output mode 0x0c8*/
+0xA6, /* display normal, bit val 0: LCD pixel off. 0x0a6*/
+0xA2, /* LCD bias 1/9 0x0a2*/
+0x2F, /* all power  control circuits on 0x02f*/
+0xF8, /* set booster ratio to 0x0f8*/
+0x00, /* 4x 0x000*/
+0x23, /* set V0 voltage resistor ratio to large 0x023*/
+0x81, /* set contrast 0x081*/
+0x27, /* contrast value 0x027*/
+0xAC, /* indicator 0x0ac*/
+0x00, /* disable 0x000*/
+0xAF,  /* display on 0x0af*/
+//0xAE,  /* display off 0x0ae*/
+//0xA5,  /* enter powersafe: all pixel on, issue 142 0x0a5*/
+};
+// break into two arrays so delays can be added
+const uint8_t PROGMEM lcdBootProgram2[] = {
+		
+};
+#else
+/*	
 const uint8_t PROGMEM lcdBootProgram[] = {
   // boot defaults are commented out but left here in case they
   // might prove useful for reference
@@ -75,7 +103,8 @@ const uint8_t PROGMEM lcdBootProgram[] = {
   // set page address range
   // 0x22, 0x00, PAGE_ADDRESS_END
 };
-
+*/
+#endif //ndef ARDUINO_ARCH_AVR
 
 Arduboy2Core::Arduboy2Core() { }
 
@@ -245,6 +274,16 @@ void Arduboy2Core::bootOLED()
   for (uint8_t i = 0; i < sizeof(lcdBootProgram); i++) {
     SPItransfer(pgm_read_byte(lcdBootProgram + i));
   }
+  delayShort(100); // copied from u8glib
+  SPItransfer(0xA5); /* display all points, ST7565 */ // copied from u8glib
+  delayShort(100); // copied from u8glib
+  delayShort(100); // copied from u8glib
+  SPItransfer(0xA4); /* normal display */ // copied from u8glib
+/*
+  for (uint8_t i = 0; i < sizeof(lcdBootProgram); i++) {
+    SPItransfer(pgm_read_byte(lcdBootProgram2 + i));
+  }
+  */
   LCDDataMode();
 }
 
@@ -271,7 +310,7 @@ void Arduboy2Core::bootSPI()
 {
 #ifdef ARDUBOY_SAMD
   SPI.begin(); // TODO: experimental to address issue of no spi signal detected on M0 port
-  SPI.beginTransaction(SPISettings(1000000, MSBFIRST, SPI_MODE0)); // was 8000000
+  SPI.beginTransaction(SPISettings(8000000, MSBFIRST, SPI_MODE0)); // was 8000000
 
   LCDDataMode(); // should be the equivalent function from ArduboyCore2 to the one from ArduboyCore_Z
 #else
@@ -334,13 +373,15 @@ void Arduboy2Core::bootPowerSaving()
 void Arduboy2Core::displayOff()
 {
   LCDCommandMode();
+  #ifndef ARDUBOY_SAMD 
   SPItransfer(0xAE); // display off
   SPItransfer(0x8D); // charge pump:
   SPItransfer(0x10); //   disable
   delayShort(250);
-#ifndef ARDUBOY_SAMD  
+ 
   bitClear(RST_PORT, RST_BIT); // set display reset pin low (reset state)
 #else
+	//TODO: implement a suitable screen shutdown instruction
   digitalWrite(PIN_RST, LOW); // set display reset pin low (reset state)
 #endif	
 }
@@ -378,9 +419,27 @@ void Arduboy2Core::paintScreen(uint8_t image[], bool clear)
  // TODO: Implement this
 #ifdef ARDUBOY_SAMD
   // TODO optimise like AVR version
-  for (int i = 0; i < (HEIGHT*WIDTH)/8; i++)
+  LCDCommandMode();
+  SPItransfer(0x81); 							// set contrast (command)
+  SPItransfer(0x32); 							// 32 = 50, 3E = 62 (out of max 63 64?)
+  delayShort(5); 								// copy the apparent 5-6ms delay in the u8glib example from oscope
+  uint8_t pageNum = 0; 							// the page number of the LCD
+  constexpr size_t size = ((HEIGHT*WIDTH)/8); 	// size of the pages
+  for (size_t index = 0; index < size; index++)
   {
-    SPItransfer(image[i]);
+    if (index == 0 || (index % 128 == 0)) {
+	  LCDCommandMode();
+	  SPItransfer(0x10);
+	  SPItransfer(0x00);
+	  if ( index  == 0) pageNum = 0xB0;   		// the page number is 0 at the beginning
+	  else pageNum = 0xB0 | (index >> 7); 		// get the page number by dividing index by 128
+      SPItransfer(pageNum);
+	  LCDDataMode();
+	}	
+    SPItransfer(image[index]); 					// send the data to the display controller
+	if(clear){
+		image[index] = 0; 						// clear the buffer if told to do so
+	}	
   }
 #else
 //TODO: reinsert the AVR code here and swap round the #ifdef with ifndef etc to make AVR the special case
@@ -430,6 +489,7 @@ void Arduboy2Core::paintScreen(uint8_t image[], bool clear)
 void Arduboy2Core::blank()
 {
   for (int i = 0; i < (HEIGHT*WIDTH)/8; i++)
+	  // this probably needs a helper function or two to send the required data to the LCD with appropriate page wrappers and commands
     SPItransfer(0x00);
 }
 

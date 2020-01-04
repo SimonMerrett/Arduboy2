@@ -7,6 +7,9 @@
 #ifndef ARDUBOY2_H
 #define ARDUBOY2_H
 
+//#ifndef ARDUBOY_UC1701
+//#define ARDUBOY_UC1701 // TODO: experimental #define to compile for LCD display
+
 #include <Arduino.h>
 //#include <EEPROM.h> // TODO: decide what to do about EEPROM
 #include "Arduboy2Core.h"
@@ -14,6 +17,8 @@
 #include "Sprites.h"
 #include "SpritesB.h"
 #include <Print.h>
+
+
 
 /** \brief
  * Library version
@@ -1650,5 +1655,6 @@ class Arduboy2 : public Print, public Arduboy2Base
   bool textWrap;
 };
 
+//#endif // TODO: experimental for LCD
 #endif
 

@@ -7,6 +7,9 @@
 #ifndef ARDUBOY2_CORE_H
 #define ARDUBOY2_CORE_H
 
+#ifndef ARDUBOY_UC1701
+#define ARDUBOY_UC1701
+
 #include <Arduino.h>
 
 #if !defined (_SAMD21_) // TODO: replace with agreed condition for SAMD port
@@ -14,6 +17,7 @@
   #include <avr/sleep.h>
 #else
   #include <SPI.h>
+
 #endif
 
 // main hardware compile flags
@@ -86,7 +90,7 @@ arduino_zero\variant.cpp
 #define PIN_SPEAKER_1_BITMASK digitalPinToBitMask(PIN_SPEAKER_1)
 #define PIN_SPEAKER_2_BITMASK digitalPinToBitMask(PIN_SPEAKER_2)
 
-#define PIN_CS 11		// PA18 Display CS Arduino pin number
+#define PIN_CS 10		// PA18 Display CS Arduino pin number
 #define CS_PORT PORTA	// Display CS port
 #define CS_BIT 18		// Display CS physical bit number
 
@@ -913,4 +917,5 @@ class Arduboy2Core
     void static bootPowerSaving();
 };
 
+#endif // #ifndef ARDUBOY_UC1701
 #endif
