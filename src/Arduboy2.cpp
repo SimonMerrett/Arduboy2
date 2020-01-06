@@ -337,7 +337,7 @@ unsigned long Arduboy2Base::generateRandomSeed()
 
   power_adc_disable(); // ADC off
 #else
-	seed = analogRead(A4) * ~micros() + micros();
+	seed = (unsigned long)analogRead(A4) * ~micros() + micros();
 #endif // ndef ARDUBOY_SAMD
   return seed;
 }

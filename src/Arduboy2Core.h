@@ -8,7 +8,7 @@
 #define ARDUBOY2_CORE_H
 
 #ifndef ARDUBOY_UC1701
-#define ARDUBOY_UC1701
+#define ARDUBOY_UC1701 // this defines that we're using the UC1701 LCD display Comment out if using OLED
 
 #include <Arduino.h>
 
@@ -21,6 +21,8 @@
 #endif
 
 // main hardware compile flags
+
+
 
 #if !defined(ARDUBOY_10) && !defined(AB_DEVKIT)
 /* defaults to Arduboy Release 1.0 if not using a boards.txt file

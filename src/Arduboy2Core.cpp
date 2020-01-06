@@ -18,16 +18,16 @@ const uint8_t PROGMEM lcdBootProgram[] = {  // all data verified with o'scope us
 0xE2, /* soft reset 0x0e2*/
 0xAE, /* display off 0x0ae*/
 0x40, /* set display start line to 0   0x040*/
-0xA0, /* ADC set to reverse 0x0a0*/
-0xC8, /* common output mode 0x0c8*/
-0xA6, /* display normal, bit val 0: LCD pixel off. 0x0a6*/
-0xA2, /* LCD bias 1/9 0x0a2*/
+0xA0, /* ADC set to reverse (was originally set to reverse 0x0a0)*/
+0xC8, /* common output mode (was originally set to 0x0c8)*/
+0xA6, /* display normal, not inverted, bit val 0: LCD pixel off. 0x0a6*/
+0xA2, /* LCD bias 1/9 (was originally 1/9 0x0a2)*/
 0x2F, /* all power  control circuits on 0x02f*/
-0xF8, /* set booster ratio to 0x0f8*/
-0x00, /* 4x 0x000*/
-0x23, /* set V0 voltage resistor ratio to large 0x023*/
+0xF8, /* set booster ratio to... 0x0f8*/
+0x00, /* (was originally 4x 0x000)*/
+0x24, /* set V0 voltage resistor ratio to default (was originally 0x023)*/
 0x81, /* set contrast 0x081*/
-0x27, /* contrast value 0x027*/
+0x20, /* contrast value (originally was 0x027)*/
 0xAC, /* indicator 0x0ac*/
 0x00, /* disable 0x000*/
 0xAF,  /* display on 0x0af*/
@@ -417,12 +417,12 @@ void Arduboy2Core::paintScreen(const uint8_t *image)
 void Arduboy2Core::paintScreen(uint8_t image[], bool clear)
 {
  // TODO: Implement this
-#ifdef ARDUBOY_SAMD
+#ifdef ARDUBOY_UC1701
   // TODO optimise like AVR version
   LCDCommandMode();
-  SPItransfer(0x81); 							// set contrast (command)
-  SPItransfer(0x32); 							// 32 = 50, 3E = 62 (out of max 63 64?)
-  delayShort(5); 								// copy the apparent 5-6ms delay in the u8glib example from oscope
+ // SPItransfer(0x81); 							// set contrast (command)
+ // SPItransfer(0x20); 	/* routinely 0x32 */	// 32 = 50, 3E = 62 (out of max 63 64?)
+ // delayShort(5); 								// copy the apparent 5-6ms delay in the u8glib example from oscope
   uint8_t pageNum = 0; 							// the page number of the LCD
   constexpr size_t size = ((HEIGHT*WIDTH)/8); 	// size of the pages
   for (size_t index = 0; index < size; index++)
