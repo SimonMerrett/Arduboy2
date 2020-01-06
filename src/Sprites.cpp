@@ -148,10 +148,10 @@ void Sprites::drawBitmap(int16_t x, int16_t y,
             Arduboy2Base::sBuffer[ofs] = data;
           }
           if (yOffset != 0 && sRow < 7) {
-            data = Arduboy2Base::sBuffer[ofs + WIDTH];
+            data = Arduboy2Base::sBuffer[(ofs + WIDTH) & 0xFFFF];	// CHANGED TO ADDRESS INTEGER OVERFLOW ERROR
             data &= (*((unsigned char *) (&mask_data) + 1));
             data |= (*((unsigned char *) (&bitmap_data) + 1));
-            Arduboy2Base::sBuffer[ofs + WIDTH] = data;
+            Arduboy2Base::sBuffer[(ofs + WIDTH) & 0xFFFF] = data;	// CHANGED TO ADDRESS INTEGER OVERFLOW ERROR
           }
           ofs++;
           bofs++;
@@ -170,7 +170,7 @@ void Sprites::drawBitmap(int16_t x, int16_t y,
             Arduboy2Base::sBuffer[ofs] |= (uint8_t)(bitmap_data);
           }
           if (yOffset != 0 && sRow < 7) {
-            Arduboy2Base::sBuffer[ofs + WIDTH] |= (*((unsigned char *) (&bitmap_data) + 1));
+            Arduboy2Base::sBuffer[(ofs + WIDTH) & 0xFFFF] |= (*((unsigned char *) (&bitmap_data) + 1)); // CHANGED TO ADDRESS INTEGER OVERFLOW ERROR
           }
           ofs++;
           bofs++;
@@ -189,7 +189,7 @@ void Sprites::drawBitmap(int16_t x, int16_t y,
             Arduboy2Base::sBuffer[ofs]  &= ~(uint8_t)(bitmap_data);
           }
           if (yOffset != 0 && sRow < 7) {
-            Arduboy2Base::sBuffer[ofs + WIDTH] &= ~(*((unsigned char *) (&bitmap_data) + 1));
+            Arduboy2Base::sBuffer[(ofs + WIDTH) & 0xFFFF] &= ~(*((unsigned char *) (&bitmap_data) + 1));	// CHANGED TO ADDRESS INTEGER OVERFLOW ERROR
           }
           ofs++;
           bofs++;
@@ -223,10 +223,10 @@ void Sprites::drawBitmap(int16_t x, int16_t y,
             Arduboy2Base::sBuffer[ofs] = data;
           }
           if (yOffset != 0 && sRow < 7) {
-            data = Arduboy2Base::sBuffer[ofs + WIDTH];
+            data = Arduboy2Base::sBuffer[(ofs + WIDTH) & 0xFFFF];	// CHANGED TO ADDRESS INTEGER OVERFLOW ERROR
             data &= (*((unsigned char *) (&mask_data) + 1));
             data |= (*((unsigned char *) (&bitmap_data) + 1));
-            Arduboy2Base::sBuffer[ofs + WIDTH] = data;
+            Arduboy2Base::sBuffer[(ofs + WIDTH) & 0xFFFF] = data;	// CHANGED TO ADDRESS INTEGER OVERFLOW ERROR
           }
           ofs++;
           mask_ofs++;
