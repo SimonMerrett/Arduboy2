@@ -16,7 +16,8 @@ void Arduboy2Audio::on()
   bitSet(SPEAKER_1_DDR, SPEAKER_1_BIT);
   bitSet(SPEAKER_2_DDR, SPEAKER_2_BIT);
 #elif defined ARDUBOY_SAMD
-  pinMode(PIN_SPEAKER_1, INPUT);
+// TODO: test whether STRONG drive makes a difference to the volume on SAMD devices and implement if needed
+  pinMode(PIN_SPEAKER_1, OUTPUT); // COMMIT DOCS: changed from input (typo) to OUTPUT
 #else
   bitSet(SPEAKER_1_DDR, SPEAKER_1_BIT);
 #endif

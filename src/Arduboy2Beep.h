@@ -247,10 +247,22 @@ class BeepPin1
    * sketch's code size unless the sketch also uses floating point math for
    * other purposes.
    */
+#ifdef ARDUBOY_SAMD   
+  static constexpr uint16_t freq(const float hz)
+  { // 1024 prescaler used
+    return (uint16_t) (((F_CPU / 1024 / 2) + (hz / 2)) / hz) - 1;
+  }
+#else
   static constexpr uint16_t freq(const float hz)
   {
     return (uint16_t) (((F_CPU / 8 / 2) + (hz / 2)) / hz) - 1;
   }
+#endif //def ARDUBOY_SAMD  
+  /** \brief
+   * initialise the timer for SAMD21
+   * 
+   */
+   static void initSAMD21timer();
 };
 
 
@@ -352,10 +364,24 @@ class BeepPin2
    * \details
    * For details see `BeepPin1::freq()`.
    */
+#ifdef ARDUBOY_SAMD   
+  static constexpr uint16_t freq(const float hz)
+  { // 1024 prescaler used
+    return (uint16_t) (((F_CPU / 1024 / 2) + (hz / 2)) / hz) - 1;
+  }
+#else
   static constexpr uint16_t freq(const float hz)
   {
-    return (uint16_t) (((F_CPU / 128 / 2) + (hz / 2)) / hz) - 1;
+    return (uint16_t) (((F_CPU / 8 / 2) + (hz / 2)) / hz) - 1;
   }
+#endif //def ARDUBOY_SAMD  
+  
+  /** \brief
+   * initialise the timer for SAMD21
+   * 
+   */
+  static void initSAMD21timer();
+  
 };
 
 #endif

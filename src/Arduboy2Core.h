@@ -83,8 +83,10 @@ arduino_zero\variant.cpp
 #define A_BUTTON bit(1)
 #define B_BUTTON bit(2)
 
-#define PIN_SPEAKER_1 5
-#define PIN_SPEAKER_2 A0
+#define PIN_SPEAKER_1 5				// PA15
+#define PINPORT_SPEAKER_1 PORT_PA15 // PA15
+#define PIN_SPEAKER_2 A0 			// PA02
+#define PINPORT_SPEAKER_2 PORT_PA02 // PA02
 
 #define PIN_SPEAKER_1_PORT digitalPinToPort(PIN_SPEAKER_1)
 #define PIN_SPEAKER_2_PORT digitalPinToPort(PIN_SPEAKER_2)
