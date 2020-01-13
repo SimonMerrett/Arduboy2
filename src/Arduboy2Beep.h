@@ -250,7 +250,7 @@ class BeepPin1
 #ifdef ARDUBOY_SAMD   
   static constexpr uint16_t freq(const float hz)
   { // 1024 prescaler used
-    return (uint16_t) (((F_CPU / 1024 / 2) + (hz / 2)) / hz) - 1;
+    return (uint16_t) (((F_CPU / 256 / 2) + (hz / 2)) / hz) - 1;
   }
 #else
   static constexpr uint16_t freq(const float hz)
@@ -366,8 +366,8 @@ class BeepPin2
    */
 #ifdef ARDUBOY_SAMD   
   static constexpr uint16_t freq(const float hz)
-  { // 1024 prescaler used
-    return (uint16_t) (((F_CPU / 1024 / 2) + (hz / 2)) / hz) - 1;
+  { // 256 prescaler used
+    return (uint16_t) (((F_CPU / 256 / 2) + (hz / 2)) / hz) - 1;
   }
 #else
   static constexpr uint16_t freq(const float hz)
