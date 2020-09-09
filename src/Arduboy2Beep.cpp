@@ -80,6 +80,7 @@ void BeepPin1::tone(uint16_t count) // TODO: implement if needed
 
 void BeepPin1::tone(uint16_t count, uint8_t dur) // TODO: implement if needed
 {
+  duration = dur;
   // Enable output (start PWM)
   TCC0->CTRLA.reg |= (TCC_CTRLA_ENABLE);
   while (TCC0->SYNCBUSY.bit.ENABLE);              // Wait for synchronization

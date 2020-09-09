@@ -12,81 +12,93 @@
 #include <avr/wdt.h> 
 #endif
 
-#if defined (ARDUBOY_SAMD)
+// #if defined (ARDUBOY_SAMD)
 // THIS CODE INITIALISES THE 128*64 LCD DISPLAY WTIH UC1701 CONTROLLER WITH SPI INTERFACE - NOT FOR NORMAL ARDUBOYS. TAKEN FROM U8G2LIB
-const uint8_t PROGMEM lcdBootProgram[] = {  // all data verified with o'scope using u8g2 example of ug2.begin()
-0xE2, /* soft reset 0x0e2*/
-0xAE, /* display off 0x0ae*/
-0x40, /* set display start line to 0   0x040*/
-0xA0, /* ADC set to reverse (was originally set to reverse 0x0a0)*/
-0xC8, /* common output mode (was originally set to 0x0c8)*/
-0xA6, /* display normal, not inverted, bit val 0: LCD pixel off. 0x0a6*/
-0xA2, /* LCD bias 1/9 (was originally 1/9 0x0a2)*/
-0x2F, /* all power  control circuits on 0x02f*/
-0xF8, /* set booster ratio to... 0x0f8*/
-0x00, /* (was originally 4x 0x000)*/
-0x24, /* set V0 voltage resistor ratio to default (was originally 0x023)*/
-0x81, /* set contrast 0x081*/
-0x20, /* contrast value (originally was 0x027)*/
-0xAC, /* indicator 0x0ac*/
-0x00, /* disable 0x000*/
-0xAF,  /* display on 0x0af*/
-//0xAE,  /* display off 0x0ae*/
-//0xA5,  /* enter powersafe: all pixel on, issue 142 0x0a5*/
-};
+// const uint8_t PROGMEM displayBootProgram[] = {  // all data verified with o'scope using u8g2 example of ug2.begin()
+// 0xE2, /* soft reset 0x0e2*/
+// 0xAE, /* display off 0x0ae*/
+// 0x40, /* set display start line to 0   0x040*/
+// 0xA0, /* ADC set to reverse (was originally set to reverse 0x0a0)*/
+// 0xC8, /* common output mode (was originally set to 0x0c8)*/
+// 0xA6, /* display normal, not inverted, bit val 0: LCD pixel off. 0x0a6*/
+// 0xA2, /* LCD bias 1/9 (was originally 1/9 0x0a2)*/
+// 0x2F, /* all power  control circuits on 0x02f*/
+// 0xF8, /* set booster ratio to... 0x0f8*/
+// 0x00, /* (was originally 4x 0x000)*/
+// 0x24, /* set V0 voltage resistor ratio to default (was originally 0x023)*/
+// 0x81, /* set contrast 0x081*/
+// 0x20, /* contrast value (originally was 0x027)*/
+// 0xAC, /* indicator 0x0ac*/
+// 0x00, /* disable 0x000*/
+// 0xAF,  /* display on 0x0af*/
+// //0xAE,  /* display off 0x0ae*/
+// //0xA5,  /* enter powersafe: all pixel on, issue 142 0x0a5*/
+// };
 // break into two arrays so delays can be added
-const uint8_t PROGMEM lcdBootProgram2[] = {
+const uint8_t PROGMEM displayBootProgram2[] = {
 		
 };
-#else
-/*	
-const uint8_t PROGMEM lcdBootProgram[] = {
-  // boot defaults are commented out but left here in case they
-  // might prove useful for reference
-  //
-  // Further reading: https://www.adafruit.com/datasheets/SSD1306.pdf
-  //
-  // Display Off
-  // 0xAE,
+// #else
+	
+const uint8_t PROGMEM displayBootProgram[] = {
 
-  // Set Display Clock Divisor v = 0xF0
-  // default is 0x80
-  0xD5, 0xF0,
+   0xAE, // Display OFF/ON: off (POR = 0xae)
+   0xA4, // Set Entire Display OFF/ON: off (POR = 0xa4)
+
+   0xD5, 0x50, // Divide Ratio/Oscillator FrequencyData Set: divide ratio = 1 (POR = 1), Oscillator Frequency = +/- 0% (POR = +/- 0%)
 
   // Set Multiplex Ratio v = 0x3F
-  // 0xA8, 0x3F,
+   0xA8, 0x3F,  // Multiplex Ratio Data Set: 64 (POR = 0x3f, 64)
 
   // Set Display Offset v = 0
-  // 0xD3, 0x00,
+   0xD3, 0x00,  // Display OffsetData Set: 0 (POR = 0x00)
 
   // Set Start Line (0)
-  // 0x40,
+   0x40, // Set Display Start Line: 0  (was 0x40)
+
+  0x010,		/* TEST FOR CENTRING set upper 4 bit of the col adr to 0 */
+  0x002,		/* TEST FOR CENTRING set lower 4 bit of the col adr to 2 (centered display with sh1106)  */
 
   // Charge Pump Setting v = enable (0x14)
   // default is disabled
-  0x8D, 0x14,
+  0xAD, 0x8B, // DC-DC ON/OFF Mode Set: Built-in DC-DC is used, Normal Display (POR = 0x8b)
+
+  0xD9, 0x22, // Dis-charge/Pre-charge PeriodData Set: pre-charge 2 DCLKs, dis-charge 2 DCLKs (POR = 0x22, pre-charge 2 DCLKs, dis-charge 2 DCLKs)
+
+  0xDB, 0x35, // VCOM Deselect LevelData Set: 0,770V (POR = 0x35, 0,770 V)
+
+  0x32,  // Set Pump voltage value: 8,0 V (POR = 0x32, 8,0 V)
+  
+  0x81, 0xFF, // Contrast Data Register Set: 255 (large) (POR = 0x80)
+  
+  0xA6,  // Set Normal/Reverse Display: normal (POR = 0xa6)
+   
+  0xDA, 0x12, // com pin HW config, sequential com pin config (bit 4), disable left/right remap (bit 5) 
 
   // Set Segment Re-map (A0) | (b0001)
   // default is (b0000)
-  0xA1,
+  //0xA1,
 
   // Set COM Output Scan Direction
-  0xC8,
+ // 0xC8,
 
   // Set COM Pins v
   // 0xDA, 0x12,
 
   // Set Contrast v = 0xCF
-  0x81, 0xCF,
+  //0x81, 0xFF,
 
   // Set Precharge = 0xF1
-  0xD9, 0xF1,
+  //0xD9, 0x1F,
 
   // Set VCom Detect
   // 0xDB, 0x40,
+   
+  // Set VPP
+  //0x33,
 
   // Entire Display ON
-  // 0xA4,
+   //0xA4,
 
   // Set normal/inverse display
   // 0xA6,
@@ -95,16 +107,16 @@ const uint8_t PROGMEM lcdBootProgram[] = {
   0xAF,
 
   // set display mode = horizontal addressing mode (0x00)
-  0x20, 0x00,
+   0x20, 0x00,
 
   // set col address range
-  // 0x21, 0x00, COLUMN_ADDRESS_END,
+   0x21, 0x00, COLUMN_ADDRESS_END,
 
   // set page address range
-  // 0x22, 0x00, PAGE_ADDRESS_END
+   0x22, 0x00, PAGE_ADDRESS_END
 };
-*/
-#endif //ndef ARDUINO_ARCH_AVR
+
+//#endif //ndef ARDUINO_ARCH_AVR
 
 Arduboy2Core::Arduboy2Core() { }
 
@@ -271,17 +283,17 @@ void Arduboy2Core::bootOLED()
   // run our customized boot-up command sequence against the
   // OLED to initialize it properly for Arduboy
   LCDCommandMode();
-  for (uint8_t i = 0; i < sizeof(lcdBootProgram); i++) {
-    SPItransfer(pgm_read_byte(lcdBootProgram + i));
+  for (uint8_t i = 0; i < sizeof(displayBootProgram); i++) {
+    SPItransfer(pgm_read_byte(displayBootProgram + i));
   }
   delayShort(100); // copied from u8glib
-  SPItransfer(0xA5); /* display all points, ST7565 */ // copied from u8glib
+ // SPItransfer(0xA5); /* display all points, ST7565 */ // copied from u8glib
   delayShort(100); // copied from u8glib
   delayShort(100); // copied from u8glib
-  SPItransfer(0xA4); /* normal display */ // copied from u8glib
+ // SPItransfer(0xA4); /* normal display */ // copied from u8glib
 /*
-  for (uint8_t i = 0; i < sizeof(lcdBootProgram); i++) {
-    SPItransfer(pgm_read_byte(lcdBootProgram2 + i));
+  for (uint8_t i = 0; i < sizeof(displayBootProgram); i++) {
+    SPItransfer(pgm_read_byte(displayBootProgram2 + i));
   }
   */
   LCDDataMode();
@@ -417,7 +429,7 @@ void Arduboy2Core::paintScreen(const uint8_t *image)
 void Arduboy2Core::paintScreen(uint8_t image[], bool clear)
 {
  // TODO: Implement this
-#ifdef ARDUBOY_UC1701
+#ifdef ARDUBOY_SH1106
   // TODO optimise like AVR version
   LCDCommandMode();
  // SPItransfer(0x81); 							// set contrast (command)

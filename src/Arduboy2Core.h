@@ -7,8 +7,10 @@
 #ifndef ARDUBOY2_CORE_H
 #define ARDUBOY2_CORE_H
 
-#ifndef ARDUBOY_UC1701
-#define ARDUBOY_UC1701 // this defines that we're using the UC1701 LCD display Comment out if using OLED
+#ifndef ARDUBOY_SH1106
+#define ARDUBOY_SH1106 // this defines that we're using the SH1106 OLED display Comment out if using SSD1306 OLED
+
+
 
 #include <Arduino.h>
 
@@ -72,16 +74,16 @@ arduino_zero\variant.cpp
 #define PIN_RIGHT_BUTTON 1
 #define PIN_UP_BUTTON 4
 #define PIN_DOWN_BUTTON A3
-#define PIN_A_BUTTON A1
-#define PIN_B_BUTTON A2
+#define PIN_A_BUTTON A1 // was A1, swapped with B_button
+#define PIN_B_BUTTON A2 // was A2, swapped with A_button
 
 // bit values for button states
 #define LEFT_BUTTON bit(7)
 #define RIGHT_BUTTON bit(6)
 #define UP_BUTTON bit(4)
 #define DOWN_BUTTON bit(0)
-#define A_BUTTON bit(1)
-#define B_BUTTON bit(2)
+#define A_BUTTON bit(1) // was bit(1)
+#define B_BUTTON bit(2) // was bit(2)
 
 #define PIN_SPEAKER_1 5				// PA15
 #define PINPORT_SPEAKER_1 PORT_PA15 // PA15
@@ -921,5 +923,5 @@ class Arduboy2Core
     void static bootPowerSaving();
 };
 
-#endif // #ifndef ARDUBOY_UC1701
+#endif // #ifndef ARDUBOY_SH1106
 #endif
