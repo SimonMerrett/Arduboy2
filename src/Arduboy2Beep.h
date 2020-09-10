@@ -15,6 +15,8 @@
  * pin 2. Both classes can be used in the same sketch to allow playing
  * two tones at the same time. To do this, the `begin()` and `timer()`
  * functions of both classes must be used.
+ * This is a version which has rudimentary support for SAMD21 using TC3 
+ * and implements BeepPin1. It is compatible with a matching version of ArduboyTones.
  *
  * \details
  * This class can be used to play square wave tones on speaker pin 1.
@@ -117,6 +119,8 @@
  *
  * \see BeepPin2
  */
+void TC3_Handler()__attribute__((weak)); // a weak version of the interrupt handler for SAMD21 to allow ArduboyTones to be compatible
+
 class BeepPin1
 {
  public:
@@ -290,7 +294,6 @@ class BeepPin1
 /*  DEPRECATED   static void toneSAMD21Old(uint16_t count, uint8_t dur);*/
 
 };
-void TC3_Handler()__attribute__((weak));
 
 /** \brief
  * Play simple square wave tones using speaker pin 2.
