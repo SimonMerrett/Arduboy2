@@ -249,8 +249,8 @@ class BeepPin1
    */
 #ifdef ARDUBOY_SAMD   
   static constexpr uint16_t freq(const float hz)
-  { // 1024 prescaler used
-    return (uint16_t) (((F_CPU / 256 / 2) + (hz / 2)) / hz) - 1;
+  { // 1024 prescaler used equates to 256 but 64 used in TC3 timer setup
+    return (uint16_t) (((F_CPU / 64 / 2) + (hz / 2)) / hz) - 1;
   }
 #else
   static constexpr uint16_t freq(const float hz)
@@ -260,11 +260,37 @@ class BeepPin1
 #endif //def ARDUBOY_SAMD  
   /** \brief
    * initialise the timer for SAMD21
-   * 
+   * Uses TC3 and toggles the speaker pin in the TC3 interrupt handler
    */
    static void initSAMD21timer();
-};
+   
+  /** \brief
+   * initialise the timer for SAMD21
+   * Uses TCC0 in waveform generation mode
+   */
+/*  DEPRECATED       static void initSAMD21timerOld();*/
+  
+  /** \brief
+   * pause the timer for SAMD21
+   */
+   static void pauseSAMD21timer();
+  /** \brief
+   * pause the timer for SAMD21
+   */
+/*  DEPRECATED   static void pauseSAMD21timerOld();*/
 
+  /** \brief
+   * Play a tone for SAMD21
+   */
+   static void toneSAMD21(uint16_t count, uint8_t dur);
+   
+   /** \brief
+   * Play a tone for SAMD21
+   */
+/*  DEPRECATED   static void toneSAMD21Old(uint16_t count, uint8_t dur);*/
+
+};
+void TC3_Handler()__attribute__((weak));
 
 /** \brief
  * Play simple square wave tones using speaker pin 2.
@@ -366,8 +392,8 @@ class BeepPin2
    */
 #ifdef ARDUBOY_SAMD   
   static constexpr uint16_t freq(const float hz)
-  { // 256 prescaler used
-    return (uint16_t) (((F_CPU / 256 / 2) + (hz / 2)) / hz) - 1;
+  { // 64 prescaler used
+    return (uint16_t) (((F_CPU / 64 / 2) + (hz / 2)) / hz) - 1;
   }
 #else
   static constexpr uint16_t freq(const float hz)

@@ -7,9 +7,6 @@
 #ifndef ARDUBOY2_H
 #define ARDUBOY2_H
 
-//#ifndef ARDUBOY_UC1701
-//#define ARDUBOY_UC1701 // TODO: experimental #define to compile for LCD display
-
 #include <Arduino.h>
 //#include <EEPROM.h> // TODO: decide what to do about EEPROM
 #include "Arduboy2Core.h"
