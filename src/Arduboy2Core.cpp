@@ -7,7 +7,7 @@
 #include "Arduboy2Core.h"
 
 #ifdef _SAMD21_
-// TODO: Implement this
+// TODO: Tidy up and replace magic numbers with variables
 #else
 #include <avr/wdt.h> 
 #endif
@@ -43,12 +43,12 @@ const uint8_t PROGMEM displayBootProgram2[] = {
 const uint8_t PROGMEM displayBootProgram[] = {
 
    0xAE, // Display OFF/ON: off (POR = 0xae)
-   0xA4, // Set Entire Display OFF/ON: off (POR = 0xa4)
+ //  0xA4, // Set Entire Display OFF/ON: off (POR = 0xa4)
 
    0xD5, 0x50, // Divide Ratio/Oscillator FrequencyData Set: divide ratio = 1 (POR = 1), Oscillator Frequency = +/- 0% (POR = +/- 0%)
 
   // Set Multiplex Ratio v = 0x3F
-   0xA8, 0x3F,  // Multiplex Ratio Data Set: 64 (POR = 0x3f, 64)
+   0xA8, 0x3f,  // Multiplex Ratio Data Set: 64 (POR = 0x3f, 64)
 
   // Set Display Offset v = 0
    0xD3, 0x00,  // Display OffsetData Set: 0 (POR = 0x00)
@@ -56,8 +56,10 @@ const uint8_t PROGMEM displayBootProgram[] = {
   // Set Start Line (0)
    0x40, // Set Display Start Line: 0  (was 0x40)
 
-  0x010,		/* TEST FOR CENTRING set upper 4 bit of the col adr to 0 */
-  0x002,		/* TEST FOR CENTRING set lower 4 bit of the col adr to 2 (centered display with sh1106)  */
+  0x02,		/* TEST FOR CENTRING set lower 4 bit of the col adr to 2 (centered display with sh1106)  */
+  0x10,		/* TEST FOR CENTRING set upper 4 bit of the col adr to 0 */
+  
+  //0xB1,
 
   // Charge Pump Setting v = enable (0x14)
   // default is disabled
@@ -69,7 +71,7 @@ const uint8_t PROGMEM displayBootProgram[] = {
 
   0x32,  // Set Pump voltage value: 8,0 V (POR = 0x32, 8,0 V)
   
-  0x81, 0xFF, // Contrast Data Register Set: 255 (large) (POR = 0x80)
+  0x81, 0x3F, // Contrast Data Register Set: 255 (large) (POR = 0x80)
   
   0xA6,  // Set Normal/Reverse Display: normal (POR = 0xa6)
    
@@ -77,7 +79,7 @@ const uint8_t PROGMEM displayBootProgram[] = {
 
   // Set Segment Re-map (A0) | (b0001)
   // default is (b0000)
-  //0xA1,
+ // 0xA1,
 
   // Set COM Output Scan Direction
  // 0xC8,
@@ -103,17 +105,20 @@ const uint8_t PROGMEM displayBootProgram[] = {
   // Set normal/inverse display
   // 0xA6,
 
-  // Display On
-  0xAF,
+
 
   // set display mode = horizontal addressing mode (0x00)
-   0x20, 0x00,
+//   0x20, 0x00,
 
   // set col address range
-   0x21, 0x00, COLUMN_ADDRESS_END,
+ //  0x1F,
+ //  0x00, 
+ //  COLUMN_ADDRESS_END,
 
   // set page address range
-   0x22, 0x00, PAGE_ADDRESS_END
+ //  0x22, 0x00, PAGE_ADDRESS_END,
+     // Display On
+  0xAF
 };
 
 //#endif //ndef ARDUINO_ARCH_AVR
@@ -442,7 +447,7 @@ void Arduboy2Core::paintScreen(uint8_t image[], bool clear)
     if (index == 0 || (index % 128 == 0)) {
 	  LCDCommandMode();
 	  SPItransfer(0x10);
-	  SPItransfer(0x00);
+	  SPItransfer(0x02);
 	  if ( index  == 0) pageNum = 0xB0;   		// the page number is 0 at the beginning
 	  else pageNum = 0xB0 | (index >> 7); 		// get the page number by dividing index by 128
       SPItransfer(pageNum);
